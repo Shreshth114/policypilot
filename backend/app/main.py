@@ -2,9 +2,12 @@
 Main FastAPI Application Entrypoint for PolicyPilot.
 """
 import logging
+from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
@@ -28,6 +31,9 @@ async def lifespan(app: FastAPI):
     eng = get_engine()
     Base.metadata.create_all(bind=eng)
     logger.info("Database initialized successfully.")
+    if settings.SEED_POLICIES:
+        from app.services.seed import seed_bundled_policies
+        seed_bundled_policies()
     yield
     # Shutdown
     logger.info("Shutting down PolicyPilot backend...")
@@ -55,6 +61,9 @@ app.include_router(retrieval_router, prefix="/api/retrieval", tags=["Retrieval"]
 
 @app.get("/", tags=["Root"])
 def root():
+    index = Path(__file__).resolve().parents[2] / "frontend" / "dist" / "index.html"
+    if index.is_file():
+        return FileResponse(index)
     return {
         "service": "PolicyPilot Backend",
         "status": "running",
@@ -87,7 +96,14 @@ def health_check(db: Session = Depends(get_db)):
             "embedding_provider": settings.EMBEDDING_PROVIDER,
             "chunk_size": settings.CHUNK_SIZE,
             "chunk_overlap": settings.CHUNK_OVERLAP,
-            "rrf_k": settings.RRF_K
+            "rrf_k": settings.RRF_K,
+            "demo_mode": settings.DEMO_MODE
         }
     }
+
+
+# Register after API routes so missing API endpoints keep their JSON 404s.
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if frontend_dist.is_dir():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="website")
 

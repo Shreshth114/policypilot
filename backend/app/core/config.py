@@ -26,6 +26,8 @@ class Settings(BaseSettings):
 
     # Storage paths
     STORAGE_DIR: str = str(BASE_DIR / "storage" / "pdfs")
+    DEMO_MODE: bool = False
+    SEED_POLICIES: bool = False
 
     # AI & Model Providers
     OPENAI_API_KEY: str | None = Field(default=None, env="OPENAI_API_KEY")

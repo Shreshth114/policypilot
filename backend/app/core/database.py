@@ -56,7 +56,12 @@ def get_engine():
     if engine is not None:
         return engine
 
-    if is_postgres_listening(settings.DB_HOST, settings.DB_PORT):
+    if settings.DATABASE_URL and settings.DATABASE_URL.startswith("sqlite:"):
+        engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
+        IS_SQLITE = True
+        HAS_PGVECTOR_EXTENSION = False
+
+    if engine is None and is_postgres_listening(settings.DB_HOST, settings.DB_PORT):
         try:
             init_postgres_db()
             db_url = settings.sync_database_url

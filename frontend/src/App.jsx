@@ -48,6 +48,11 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {health?.config?.demo_mode && (
+          <div className="mb-5 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            Public demo: explore the included policies and ask questions. Document changes and benchmark runs are disabled. Chat history may reset when the server restarts.
+          </div>
+        )}
         {/* Student Interface */}
         {activeTab === 'assistant' && (
           <ChatTab 
