@@ -52,7 +52,12 @@ class DeploymentTests(unittest.TestCase):
                 self.assertEqual(client.post("/api/documents/upload", files={
                     "file": ("test.pdf", b"not a PDF", "application/pdf"),
                 }).status_code, 403)
-                self.assertEqual(client.post("/api/retrieval/evaluate").status_code, 403)
+                evaluation = client.post("/api/retrieval/evaluate")
+                self.assertEqual(evaluation.status_code, 200)
+                self.assertEqual(evaluation.json()["test_queries_evaluated"], 6)
+                self.assertEqual(set(evaluation.json()["modes"]), {
+                    "semantic", "semantic_hyde", "keyword", "hybrid", "hybrid_hyde",
+                })
                 self.assertEqual(client.get("/api/nonexistent").status_code, 404)
                 self.assertEqual(client.get("/.env").status_code, 404)
 

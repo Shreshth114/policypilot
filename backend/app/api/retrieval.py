@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.demo import require_writable_catalog
 from app.models.schemas import SearchRequest, SearchResponse, EvaluationResult
 from app.services.search import unified_retrieval
 from app.services.evaluation import run_retrieval_evaluation
@@ -28,7 +27,7 @@ def search_policies(req: SearchRequest, db: Session = Depends(get_db)):
         latency_ms=res["latency_ms"]
     )
 
-@router.post("/evaluate", response_model=EvaluationResult, dependencies=[Depends(require_writable_catalog)])
+@router.post("/evaluate", response_model=EvaluationResult)
 def evaluate_retrieval(db: Session = Depends(get_db)):
     """
     Executes the retrieval evaluation benchmark comparing:

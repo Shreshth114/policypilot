@@ -21,7 +21,8 @@ the backend at runtime.
 - SQLite lives in `/tmp/policypilot`. Data can reset on restart or deployment.
 - Both tracked PDFs under `backend/storage/pdfs` are indexed automatically at
   startup. SHA-256 deduplication makes repeat startup safe.
-- Public demo mode blocks uploads, deletions, and benchmark execution in the API.
+- Public demo mode blocks uploads and deletions in the API. Retrieval benchmarks
+  remain available and use the configured provider's free-tier quota.
   Normal local development keeps those features enabled.
 - Groq free-tier quotas still apply. The existing offline fallback is used if the
   provider cannot answer. This setup is for a small demonstration, with one server

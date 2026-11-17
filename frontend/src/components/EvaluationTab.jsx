@@ -20,6 +20,7 @@ export default function EvaluationTab() {
   const [evalData, setEvalData] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSec, setElapsedSec] = useState(0);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let interval = null;
@@ -36,11 +37,12 @@ export default function EvaluationTab() {
 
   const handleRunEvaluation = async () => {
     setIsRunning(true);
+    setError('');
     try {
       const data = await runEvaluation();
       setEvalData(data);
     } catch (err) {
-      alert("Failed to run evaluation benchmark: " + (err.response?.data?.detail || err.message));
+      setError("Failed to run evaluation benchmark: " + (err.response?.data?.detail || err.message));
     } finally {
       setIsRunning(false);
     }
@@ -112,6 +114,12 @@ export default function EvaluationTab() {
           )}
         </button>
       </div>
+
+      {error && (
+        <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+          {error}
+        </div>
+      )}
 
       {/* Metric Definitions & Educational Card */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
