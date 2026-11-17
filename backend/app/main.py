@@ -96,8 +96,7 @@ def health_check(db: Session = Depends(get_db)):
             "embedding_provider": settings.EMBEDDING_PROVIDER,
             "chunk_size": settings.CHUNK_SIZE,
             "chunk_overlap": settings.CHUNK_OVERLAP,
-            "rrf_k": settings.RRF_K,
-            "demo_mode": settings.DEMO_MODE
+            "rrf_k": settings.RRF_K
         }
     }
 

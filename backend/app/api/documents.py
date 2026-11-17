@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.demo import require_writable_catalog
 from app.models.policy import Policy
 from app.models.schemas import DocumentResponse, DocumentUploadResponse
 from app.services.ingestion import ingest_pdf_file
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-@router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_writable_catalog)])
+@router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(
     file: UploadFile = File(...),
     category: str = Form("General"),
@@ -76,7 +75,7 @@ def list_documents(db: Session = Depends(get_db)):
     policies = db.query(Policy).order_by(Policy.upload_date.desc()).all()
     return [p.to_dict() for p in policies]
 
-@router.delete("/{document_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(require_writable_catalog)])
+@router.delete("/{document_id}", status_code=status.HTTP_200_OK)
 def delete_document(document_id: str, db: Session = Depends(get_db)):
     """Delete a policy and all associated chunks."""
     policy = db.query(Policy).filter(Policy.id == document_id).first()

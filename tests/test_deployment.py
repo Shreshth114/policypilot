@@ -8,7 +8,6 @@ from pathlib import Path
 
 temporary_storage = tempfile.TemporaryDirectory()
 os.environ.update(
-    DEMO_MODE="true",
     SEED_POLICIES="true",
     STORAGE_DIR=temporary_storage.name,
     DATABASE_URL=f"sqlite:///{temporary_storage.name}/test.db",
@@ -29,7 +28,6 @@ class DeploymentTests(unittest.TestCase):
                 health = client.get("/api/health").json()
                 self.assertEqual(health["status"], "healthy")
                 self.assertEqual(health["database"]["backend"], "sqlite")
-                self.assertTrue(health["config"]["demo_mode"])
                 page = client.get("/")
                 self.assertIn('id="root"', page.text)
                 assets = re.findall(r'(?:src|href)="(/assets/[^\"]+)"', page.text)
@@ -48,10 +46,10 @@ class DeploymentTests(unittest.TestCase):
                 })
                 self.assertEqual(search.status_code, 200)
                 self.assertTrue(search.json()["results"])
-                self.assertEqual(client.delete(f'/api/documents/{documents[0]["id"]}').status_code, 403)
+                self.assertEqual(client.delete('/api/documents/nonexistent').status_code, 404)
                 self.assertEqual(client.post("/api/documents/upload", files={
                     "file": ("test.pdf", b"not a PDF", "application/pdf"),
-                }).status_code, 403)
+                }).status_code, 400)
                 evaluation = client.post("/api/retrieval/evaluate")
                 self.assertEqual(evaluation.status_code, 200)
                 self.assertEqual(evaluation.json()["test_queries_evaluated"], 6)

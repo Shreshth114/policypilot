@@ -21,9 +21,9 @@ the backend at runtime.
 - SQLite lives in `/tmp/policypilot`. Data can reset on restart or deployment.
 - Both tracked PDFs under `backend/storage/pdfs` are indexed automatically at
   startup. SHA-256 deduplication makes repeat startup safe.
-- Public demo mode blocks uploads and deletions in the API. Retrieval benchmarks
-  remain available and use the configured provider's free-tier quota.
-  Normal local development keeps those features enabled.
+- Uploads, deletions, chat, search, and retrieval benchmarks are all available.
+  The prototype has no admin authentication; catalog changes are available to
+  anyone visiting the website. Benchmarks use the provider's free-tier quota.
 - Groq free-tier quotas still apply. The existing offline fallback is used if the
   provider cannot answer. This setup is for a small demonstration, with one server
   instance and no persistent user-data guarantee.
@@ -35,7 +35,7 @@ python3 -m venv backend/venv
 backend/venv/bin/python -m pip install -r requirements.txt
 npm --prefix frontend ci
 npm --prefix frontend run build
-PYTHONPATH=backend DEMO_MODE=true SEED_POLICIES=true STORAGE_DIR=/tmp/policypilot DATABASE_URL=sqlite:////tmp/policypilot/policypilot.db backend/venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+PYTHONPATH=backend SEED_POLICIES=true STORAGE_DIR=/tmp/policypilot DATABASE_URL=sqlite:////tmp/policypilot/policypilot.db backend/venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 The frontend uses relative `/api` requests. Vite proxies them during development;
